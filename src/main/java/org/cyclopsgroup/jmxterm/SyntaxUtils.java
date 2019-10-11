@@ -1,6 +1,8 @@
 package org.cyclopsgroup.jmxterm;
 
 import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.converters.ArrayConverter;
+import org.apache.commons.beanutils.converters.StringConverter;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -87,6 +89,11 @@ public final class SyntaxUtils {
     Class<?> c;
     try {
       c = ClassUtils.getClass(type);
+      if (c.isArray()) {
+        ArrayConverter converter = new ArrayConverter(c, new StringConverter());
+        converter.setAllowedChars(new char[]{'.', '-', '='});
+        ConvertUtils.register(converter, c);
+      }
     } catch (ClassNotFoundException e) {
       throw new IllegalArgumentException("Type " + type + " isn't valid", e);
     }
